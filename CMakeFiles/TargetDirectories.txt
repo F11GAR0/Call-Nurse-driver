@@ -1,0 +1,4 @@
+/home/f11gar0/projects/orangepidriver/Call-Nurse-driver/CMakeFiles/rebuild_cache.dir
+/home/f11gar0/projects/orangepidriver/Call-Nurse-driver/CMakeFiles/orangepidriver.dir
+/home/f11gar0/projects/orangepidriver/Call-Nurse-driver/CMakeFiles/edit_cache.dir
+/home/f11gar0/projects/orangepidriver/Call-Nurse-driver/CMakeFiles/orangepidriver_autogen.dir
