@@ -32,21 +32,63 @@ UdpClient::UdpClient(short port){
     }
 
     Log("Socket setting succesful.");
+}
 
+int UdpClient::GetSocket(){
+    return m_Socket;
+}
+
+bool UdpClient::IsListening(){
+    return m_bRecieveThreadWorking;
+}
+
+void UdpClient::StartListen(callbackPacketRecieve on_packet_recieve){
+    m_OnPacketRecieve = on_packet_recieve;
+    m_bRecieveThreadWorking = true;
+    int err = pthread_create(&m_RecieveThread, NULL, &RecieveThreadFunc, this);
+    if (err != 0){
+        Log("Cant create thread.");
+        m_bRecieveThreadWorking = false;
+    }
+}
+
+void UdpClient::StopListen(){
+    if(m_bRecieveThreadWorking){
+        m_bRecieveThreadWorking = false;
+        pthread_join(m_RecieveThread, NULL);
+    }
+}
+
+callbackPacketRecieve UdpClient::GetRecieveCallback(){
+    return m_OnPacketRecieve;
+}
+
+UdpClient::~UdpClient(){
+    Log("Called destructor for UdpClient.");
+    if(m_bRecieveThreadWorking){
+        m_bRecieveThreadWorking = false;
+        pthread_join(m_RecieveThread, NULL);
+    }
+    close(m_Socket);
+}
+
+void* RecieveThreadFunc(void *self){
+    UdpClient *client = (UdpClient*)self;
+    int sock = client->GetSocket();
     int len;
     socklen_t size;
     char buf[128];
-
-    for(;;){
-        len = recvfrom(m_Socket, buf, sizeof(buf), 0, (sockaddr*)&cli, &size);
+    sockaddr_in cli;
+    Log("[THREAD]: Listening.");
+    while(client->IsListening()){
+        len = recvfrom(sock, buf, sizeof(buf), 0, (sockaddr*)&cli, &size);
         if(len != -1){
-            Log("gotcha!");
             ByteStream bs(buf, len);
-            //maybe short, maybe int idk
-            int id;
-            bs.Read(id, 4);
-            Log(std::to_string(id));
+            client->GetRecieveCallback()(bs);
             break;
         }
+        usleep(10);
     }
+    Log("[THREAD]: Exit listening.");
+    return nullptr;
 }

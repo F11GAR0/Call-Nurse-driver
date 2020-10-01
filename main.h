@@ -7,7 +7,6 @@
 #include <netdb.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <pthread.h>
 
 #include <iostream>
 #include <fstream>

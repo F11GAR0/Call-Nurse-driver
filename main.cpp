@@ -23,10 +23,18 @@ int main(int argc, char *argv[])
         return -1;
     }
     g_sMainDirectory = app.applicationDirPath().toStdString();
+
     ClearLog();
     Log("Session started");
 
     UdpClient *client = new UdpClient(22222);
+    client->StartListen([](ByteStream bs){
+        int id = bs.Read<int>();
+        Log("Recieved: " + std::to_string(id));
+    });
+    sleep(10);
+    client->StopListen();
 
+    delete client;
     return app.exec();
 }

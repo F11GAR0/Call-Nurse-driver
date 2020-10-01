@@ -13,6 +13,8 @@ public:
     template<class T>
     void Read(T what);
     template<class T>
+    T Read();
+    template<class T>
     void Read(T what, int len);
     template<class T>
     void Write(T what);
@@ -20,6 +22,12 @@ public:
     char *GetData();
     int GetBytes();
 };
+template<typename T>
+inline T ByteStream::Read(){
+    T ret;
+    memcpy(&ret, (void*)&data[read_offset], sizeof(T));
+    return ret;
+}
 template<typename T>
 inline void ByteStream::Read(T what)
 {
